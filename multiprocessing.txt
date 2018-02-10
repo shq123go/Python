@@ -1,0 +1,72 @@
+#多线程及进程池问题 待解决 Python 
+#子进程
+from multiprocessing import Process
+import os
+def run(name):
+    print(name,os.getpid())
+
+def fuck(name):
+    print(name,os.getpid())
+
+if name=='main':
+    p1=Process(target=run,args='1')
+    p2=Process(target=fuck,args='2')
+    p3=Process(target=fuck,args='3')
+    p1.start()
+    p2.start()
+    p3.start()
+    p1.join()
+    p2.join()
+    p3.join()
+    print('over')
+
+#进程池
+from multiprocessing import Pool
+import os, time, random
+def long_time_task(name):
+     start=time.time()
+     end=time.time()
+     print(os.getpid(),name,start,end) 
+def fuck(name):
+     start=time.time()
+     end=time.time()
+     print(os.getpid(),name,start,end) 
+if name=='main':
+    p=Pool(4)
+    p.apply_async(long_time_task,args=('first',))
+    p.apply_async(long_time_task,args=('second',))
+    p.apply_async(fuck,args=('third',))
+    p.apply_async(fuck,args=('four',))
+    p.close()
+    p.join()
+    print('over')
+
+#子进程输入输出
+import subprocess
+print('$ nslookup')
+p = subprocess.Popen(['nslookup'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+output, err = p.communicate(b'set q=mx\npython.org\nexit\n')
+print(output.decode('utf-8'))
+print('Exit code:', p.returncode)
+
+#进程通信：创建Queue对象，传给各子进程，q.put()  q.get()
+from multiprocessing import Process, Queue
+import os, time, random
+
+def write(q):
+        for x in ['cui','xin','qiang']:
+                q.put(x)
+def read(q):
+        while True:
+                y=q.get()
+                print(y)
+
+if name=='main':
+        q=Queue()
+        p1=Process(target=write,args=(q,))
+        p2=Process(target=read,args=(q,))
+        p1.start()
+        p2.start()
+        p1.join()
+        p2.terminate()
+        print('over')
