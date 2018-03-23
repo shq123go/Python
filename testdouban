@@ -1,0 +1,11 @@
+import requests
+import re
+
+content = requests.get('https://www.douban.com/').text
+pattern = re.compile('<li.*?cover.*?href="(.*?)".*?tltle="(.*?)".*?more-meta.*?author">(.*?)</span>.*?year">(.*?)</span>.*?</li>')
+
+results = re.findall(pattern,content)
+print(results)
+    url,name,author,date = result
+    print(url,name,author,date)
+print("done")
